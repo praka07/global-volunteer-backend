@@ -8,12 +8,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.stereotype.Repository;
 
 import com.global.volunteer.model.User;
 
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Repository
 public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	
     @Autowired

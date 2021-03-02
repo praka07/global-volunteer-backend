@@ -3,6 +3,7 @@ package com.global.volunteer.controller;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
@@ -10,12 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.global.volunteer.service.IGlobalVolunteerService;
 
 @RestController
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class GlobalVolunteerController {
 	
 	@Autowired
 	IGlobalVolunteerService serviceObj;
 	
-	@PostMapping
+	@PostMapping("/validateuserlogin")
 	public ResponseEntity<?> validateUserLogin(@RequestBody String requestPayload){
 		JSONObject loginPayload = new JSONObject(requestPayload);
 		if("".equalsIgnoreCase(loginPayload.getString("username")) || null == loginPayload.getString("username")) {
