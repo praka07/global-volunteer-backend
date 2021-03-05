@@ -14,7 +14,7 @@ public class User {
     private String firstName;
     private String lastName;
     private String emailId;
-    private String phoneNo;
+    private String phoneNumber;
     private String createdDate;
     private boolean active;
     private int createdBy;

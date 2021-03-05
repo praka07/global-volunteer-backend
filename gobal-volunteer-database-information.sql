@@ -26,6 +26,7 @@ FOREIGN KEY (role) REFERENCES globalvolunteer.roles(roleId)
 )
 
 
+alter table users alter column createddate varchar(50)
 
 INSERT INTO users(FIRSTNAME,LASTNAME,EMAILID,phoneNumber,PASSWORD,active,CreatedDate,createdBy,role)
 VALUES ('Biruk','kadu', 'birukfekadu123@gmail.com', '+8615558797197','abc123',1,CURRENT_DATE,1,1)
