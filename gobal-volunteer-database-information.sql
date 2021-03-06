@@ -26,7 +26,47 @@ FOREIGN KEY (role) REFERENCES globalvolunteer.roles(roleId)
 )
 
 
-alter table users alter column createddate varchar(50)
 
 INSERT INTO users(FIRSTNAME,LASTNAME,EMAILID,phoneNumber,PASSWORD,active,CreatedDate,createdBy,role)
 VALUES ('Biruk','kadu', 'birukfekadu123@gmail.com', '+8615558797197','abc123',1,CURRENT_DATE,1,1)
+=================
+Phase 2
+===================
+
+
+alter table users alter column createddate varchar(50)
+
+create table activityDetails(
+
+activityId int AUTO_INCREMENT primary key,
+activityName varchar(50),
+activityDate varchar(50),
+activityStartTime int (6),
+activityEndTime int (6),
+place varchar(30),
+duration int (10),
+content varchar (50),
+totalNumberOfPeople int (6),
+academicScore int (3),
+createdBy int,
+status bit default(0),
+createdDate varchar (50),
+ApprovedBy  int,
+approvedDate varchar(50),
+foreign key(createdBy) REFERENCES globalvolunteer.users(userId)
+
+)
+
+create table activityTransaction(
+id int AUTO_INCREMENT primary key,
+activityId int,
+volunteerId int,
+volunteerApplieddate varchar (50),
+cancel bit default(0),
+canceledDate varchar(50),
+checkInDate varchar(50),
+checkOuttime varchar(50),
+foreign key(activityId) REFERENCES globalvolunteer.activityDetails(activityId),
+foreign key (volunteerId) REFERENCES globalvolunteer.users(userId)
+)
+
