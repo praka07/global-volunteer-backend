@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import com.global.volunteer.dao.IGlobalVolunteerServiceDao;
+import com.global.volunteer.model.ActivityDetails;
 import com.global.volunteer.model.User;
 
 @Service
@@ -37,6 +38,10 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 	@Override
 	public ResponseEntity<?> updatePasswordById(String information) {
 		return daoObject.updatePasswordById(information);
+	}
+	@Override
+	public ResponseEntity<?> createActivity(ActivityDetails activityDetails) {
+		return daoObject.createActivity(activityDetails);
 	}
 
 }

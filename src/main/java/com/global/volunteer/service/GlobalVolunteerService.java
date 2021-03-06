@@ -5,6 +5,7 @@ import java.util.List;
 import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 
+import com.global.volunteer.model.ActivityDetails;
 import com.global.volunteer.model.User;
 
 public interface GlobalVolunteerService {
@@ -19,6 +20,8 @@ public interface GlobalVolunteerService {
 	ResponseEntity<?> updateUser(User updateUserInfo);
 
 	ResponseEntity<?> updatePasswordById(String information);
+
+	ResponseEntity<?> createActivity(ActivityDetails activityDetails);
 	
 
 }

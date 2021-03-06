@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.global.volunteer.model.ActivityDetails;
 import com.global.volunteer.model.User;
 import com.global.volunteer.service.IGlobalVolunteerService;
 
@@ -59,6 +60,10 @@ public class GlobalVolunteerController {
 		return serviceObj.updatePasswordById(information);
 	}
 	
+	@PostMapping("/createactivity")
+	public ResponseEntity<?> createActivity(@RequestBody ActivityDetails activityDetails) {
+		return serviceObj.createActivity(activityDetails);
+	}
 	
 
 }

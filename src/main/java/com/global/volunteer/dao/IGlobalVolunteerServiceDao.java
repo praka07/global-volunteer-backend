@@ -14,6 +14,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import com.global.volunteer.model.ActivityDetails;
 import com.global.volunteer.model.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -134,6 +135,38 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 		} catch (Exception e) {
 			log.info("update password issue {} ", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+
+	}
+
+	@Override
+	public ResponseEntity<?> createActivity(ActivityDetails activityDetails) {
+
+		String queryToExecute = "insert into activityDetails(activityName,activityDate,activityStartTime,activityEndTime,"
+				+ "place,duration,content,totalNumberOfPeople,createdBy,createdDate,ApprovedBy,approvedDate) values (:activityname,:activityDate,:activityStartTime,:activityEndTime,:place,:duration"
+				+ ",:content,:totalNumberOfPeople,:createdBy,:createdDate,:ApprovedBy,:approvedDate)";
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("activityname", activityDetails.getActivityName());
+		parameters.put("activityDate", activityDetails.getActivityDate());
+		parameters.put("activityStartTime", activityDetails.getStartTime());
+		parameters.put("activityEndTime", activityDetails.getEndTime());
+		parameters.put("place", activityDetails.getPlace());
+		parameters.put("duration", activityDetails.getDuration());
+		parameters.put("content", activityDetails.getContent());
+		parameters.put("totalNumberOfPeople", activityDetails.getTotalNumberOfPeople());
+		parameters.put("createdBy", activityDetails.getCreatedBy());
+		parameters.put("createdDate", activityDetails.getCreatedDate());
+		parameters.put("ApprovedBy", activityDetails.getApprovedBy());
+		parameters.put("approvedDate", activityDetails.getApprovedDate());
+		try {
+			namedParameterJdbcTemplate.update(queryToExecute, parameters);
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"user registered successfully\"}");
+
+		} catch (Exception e) {
+
+			log.info("error wile createActivity", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+
 		}
 
 	}
