@@ -23,4 +23,8 @@ public interface GlobalVolunteerServiceDao {
 
 	ResponseEntity<?> createActivity(ActivityDetails activityDetails);
 
+	List<ActivityDetails> getAllActivities();
+
+	ResponseEntity<?> updateActivity(ActivityDetails activityDetails);
+
 }

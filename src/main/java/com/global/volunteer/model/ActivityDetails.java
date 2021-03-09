@@ -27,6 +27,7 @@ public class ActivityDetails {
 	private int createdBy;
 	private String createdDate;
 	private int ApprovedBy;
+	private boolean status;
 	private String approvedDate;
 	
 

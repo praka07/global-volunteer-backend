@@ -65,5 +65,15 @@ public class GlobalVolunteerController {
 		return serviceObj.createActivity(activityDetails);
 	}
 	
+	@GetMapping("/listactivities")
+	public List<ActivityDetails> getAllActivities() {
+		return serviceObj.getAllActivities();
+
+	}
+	@PutMapping("/updateactivitystatus")
+	public ResponseEntity<?> updateActivity(@RequestBody ActivityDetails activityDetails) {
+		return serviceObj.updateActivity(activityDetails);
+	}
+	
 
 }

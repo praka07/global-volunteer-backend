@@ -43,5 +43,13 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 	public ResponseEntity<?> createActivity(ActivityDetails activityDetails) {
 		return daoObject.createActivity(activityDetails);
 	}
+	@Override
+	public List<ActivityDetails> getAllActivities() {
+		return daoObject.getAllActivities();
+	}
+	@Override
+	public ResponseEntity<?> updateActivity(ActivityDetails activityDetails) {
+		return daoObject.updateActivity(activityDetails);
+	}
 
 }

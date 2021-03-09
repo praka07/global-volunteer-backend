@@ -22,6 +22,10 @@ public interface GlobalVolunteerService {
 	ResponseEntity<?> updatePasswordById(String information);
 
 	ResponseEntity<?> createActivity(ActivityDetails activityDetails);
+
+	List<ActivityDetails> getAllActivities();
+
+	ResponseEntity<?> updateActivity(ActivityDetails activityDetails);
 	
 
 }

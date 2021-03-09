@@ -70,3 +70,8 @@ foreign key(activityId) REFERENCES globalvolunteer.activityDetails(activityId),
 foreign key (volunteerId) REFERENCES globalvolunteer.users(userId)
 )
 
+===============
+phase 3
+====================
+drop table GLOBALVOLUNTEER.activityTransaction
+drop table GLOBALVOLUNTEER.ACTIVITYDETAILS 

@@ -142,14 +142,14 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	@Override
 	public ResponseEntity<?> createActivity(ActivityDetails activityDetails) {
 
-		String queryToExecute = "insert into activityDetails(activityName,activityDate,activityStartTime,activityEndTime,"
-				+ "place,duration,content,totalNumberOfPeople,createdBy,createdDate,ApprovedBy,approvedDate) values (:activityname,:activityDate,:activityStartTime,:activityEndTime,:place,:duration"
+		String queryToExecute = "insert into activityDetails(activityName,activityDate,startTime,endTime,"
+				+ "place,duration,content,totalNumberOfPeople,createdBy,createdDate,ApprovedBy,approvedDate) values (:activityname,:activityDate,:startTime,:endTime,:place,:duration"
 				+ ",:content,:totalNumberOfPeople,:createdBy,:createdDate,:ApprovedBy,:approvedDate)";
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("activityname", activityDetails.getActivityName());
 		parameters.put("activityDate", activityDetails.getActivityDate());
-		parameters.put("activityStartTime", activityDetails.getStartTime());
-		parameters.put("activityEndTime", activityDetails.getEndTime());
+		parameters.put("startTime", activityDetails.getStartTime());
+		parameters.put("endTime", activityDetails.getEndTime());
 		parameters.put("place", activityDetails.getPlace());
 		parameters.put("duration", activityDetails.getDuration());
 		parameters.put("content", activityDetails.getContent());
@@ -169,6 +169,34 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 
 		}
 
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<ActivityDetails> getAllActivities() {
+		
+		String selectQuery = "SELECT * FROM ACTIVITYDETAILS ORDER BY ACTIVITYDATE DESC";
+		log.info("selectQuery -- > {}", selectQuery);
+		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
+		try {
+			list = jdbcTemplate.query(selectQuery, new BeanPropertyRowMapper(ActivityDetails.class));
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return list;
+
+		}
+		
+	}
+	@Override
+	public ResponseEntity<?> updateActivity(ActivityDetails activityDetails) {
+		String updateQuery = "update ACTIVITYDETAILS set status =? where activityid=?";
+		try {
+			jdbcTemplate.update(updateQuery, activityDetails.isStatus(), activityDetails.getActivityId());
+			return ResponseEntity.ok().body("{ \"message\" : \"status updated successfully\"}");
+		} catch (Exception e) {
+			log.info("update password issue {} ", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
 	}
 
 }
