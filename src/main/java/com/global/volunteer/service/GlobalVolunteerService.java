@@ -26,6 +26,12 @@ public interface GlobalVolunteerService {
 	List<ActivityDetails> getAllActivities();
 
 	ResponseEntity<?> updateActivity(ActivityDetails activityDetails);
+
+	List<ActivityDetails> getUpcomingActivitiesForVolunteers(int volunteerId);
+
+	ResponseEntity<?> registerActivity(String requestPayload);
+
+	ResponseEntity<?> cancelActivity(String requestPayload);
 	
 
 }

@@ -41,8 +41,8 @@ create table activityDetails(
 activityId int AUTO_INCREMENT primary key,
 activityName varchar(50),
 activityDate varchar(50),
-activityStartTime varchar(50),
-activityEndTime varchar(50),
+startTime varchar(50),
+endTime varchar(50),
 place varchar(30),
 duration int (10),
 content varchar (50),
@@ -75,3 +75,5 @@ phase 3
 ====================
 drop table GLOBALVOLUNTEER.activityTransaction
 drop table GLOBALVOLUNTEER.ACTIVITYDETAILS 
+create table again
+alter table activityDetails add appliedVolunteerCount int default(0)

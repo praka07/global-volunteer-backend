@@ -26,9 +26,10 @@ public class ActivityDetails {
 	private int totalNumberOfPeople;
 	private int createdBy;
 	private String createdDate;
-	private int ApprovedBy;
+	private int approvedBy;
 	private boolean status;
 	private String approvedDate;
+	private int appliedVolunteerCount;
 	
 
 }

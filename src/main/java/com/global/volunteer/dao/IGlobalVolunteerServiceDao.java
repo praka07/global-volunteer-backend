@@ -170,11 +170,12 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 		}
 
 	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List<ActivityDetails> getAllActivities() {
-		
-		String selectQuery = "SELECT * FROM ACTIVITYDETAILS ORDER BY ACTIVITYDATE DESC";
+
+		String selectQuery = "SELECT * FROM ACTIVITYDETAILS where PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE  ORDER BY ACTIVITYDATE DESC";
 		log.info("selectQuery -- > {}", selectQuery);
 		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
 		try {
@@ -185,18 +186,97 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 			return list;
 
 		}
-		
+
 	}
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<ActivityDetails> getUpcomingActivitiesForVolunteers(int volunteerId) {
+
+		String selectQuery = "SELECT * FROM ACTIVITYDETAILS a where "
+				+ "PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE  "
+				+ "AND STATUS=1 AND NOT"
+				+ " EXISTS(Select '' from activityTransaction where volunteerid="+volunteerId+" and activityid =a.activityid"
+				+ ") ORDER BY ACTIVITYDATE DESC";
+		log.info("selectQuery -- > {}", selectQuery);
+		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
+		try {
+			list = jdbcTemplate.query(selectQuery, new BeanPropertyRowMapper(ActivityDetails.class));
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return list;
+
+		}
+
+	}
+
 	@Override
 	public ResponseEntity<?> updateActivity(ActivityDetails activityDetails) {
-		String updateQuery = "update ACTIVITYDETAILS set status =? where activityid=?";
+		String updateQuery = "update ACTIVITYDETAILS set status =?,ApprovedBy=?,approvedDate=? where activityid=?";
 		try {
-			jdbcTemplate.update(updateQuery, activityDetails.isStatus(), activityDetails.getActivityId());
+			jdbcTemplate.update(updateQuery, activityDetails.isStatus(),activityDetails.getApprovedBy(),activityDetails.getActivityDate(), activityDetails.getActivityId());
 			return ResponseEntity.ok().body("{ \"message\" : \"status updated successfully\"}");
 		} catch (Exception e) {
 			log.info("update password issue {} ", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
+	}
+
+	@Override
+	public ResponseEntity<?> registerActivity(String requestPayload) {
+		JSONObject request = new JSONObject(requestPayload);
+		String activityTransactionInsertion = "insert into ACTIVITYTRANSACTION(activityId,volunteerid,VOLUNTEERAPPLIEDDATE) values"
+				+ " (:activityId,:volunteerid,:volunteerapplieddate) ";
+
+		Map<String, Object> parameters = new HashMap<String, Object>();
+		parameters.put("activityId", request.getInt("activityId"));
+		parameters.put("volunteerid", request.getInt("volunteerid"));
+		parameters.put("volunteerapplieddate", request.getString("volunteerAppliedDate"));
+
+		try {
+			int status = namedParameterJdbcTemplate.update(activityTransactionInsertion, parameters);
+			if (status == 1) {
+				String updateQuery="update activityDetails set appliedVolunteerCount= appliedVolunteerCount+1 where activityId="+request.getInt("activityId");
+				jdbcTemplate.update(updateQuery);
+				return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"registered successfully\"}");
+
+			} else {
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error while insert activity transaction");
+			}
+
+		} catch (Exception e) {
+
+			log.info("error wile registerActivity", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+
+		}
+	}
+	@Override
+	public ResponseEntity<?> cancelActivity(String requestPayload) {
+		JSONObject request = new JSONObject(requestPayload);
+		String updateActivityTransaction="update activityTransaction set cancel=1, canceledDate='"+request.getString("volunteerCancelDate")+"'"
+				+ " where volunteerId="+request.getInt("volunteerid")+" and  activityId="+request.getInt("activityId");
+		try {
+			int status=jdbcTemplate.update(updateActivityTransaction);
+			if(status ==1) {
+				String updateQuery="update activityDetails set appliedVolunteerCount= appliedVolunteerCount-1 where activityId="+request.getInt("activityId");
+				jdbcTemplate.update(updateQuery);
+
+				return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"cancelled successfully\"}");
+				
+			}else {
+				
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error while cancel activity transaction");
+				
+			}
+		}catch(Exception e) {
+			
+			log.info("error wile cancelActivity", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+			
+		}
+		
 	}
 
 }

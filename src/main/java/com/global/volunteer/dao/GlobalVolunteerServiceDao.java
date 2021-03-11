@@ -27,4 +27,10 @@ public interface GlobalVolunteerServiceDao {
 
 	ResponseEntity<?> updateActivity(ActivityDetails activityDetails);
 
+	List<ActivityDetails> getUpcomingActivitiesForVolunteers(int volunteerId);
+
+	ResponseEntity<?> registerActivity(String requestPayload);
+
+	ResponseEntity<?> cancelActivity(String requestPayload);
+
 }

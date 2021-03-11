@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -74,6 +75,22 @@ public class GlobalVolunteerController {
 	public ResponseEntity<?> updateActivity(@RequestBody ActivityDetails activityDetails) {
 		return serviceObj.updateActivity(activityDetails);
 	}
+	
+	@GetMapping("/volunteeractivities/{volunteerId}")
+	public List<ActivityDetails> getUpcomingActivitiesForVolunteers(@PathVariable int volunteerId) {
+		return serviceObj.getUpcomingActivitiesForVolunteers(volunteerId);
+
+	}
+	@PostMapping("/registeractivity")	
+	public ResponseEntity<?> registerActivity(@RequestBody String requestPayload) {
+		return serviceObj.registerActivity(requestPayload);
+	}
+	
+	@PostMapping("/cancelactivity")
+	public ResponseEntity<?> cancelActivity(@RequestBody String requestPayload) {
+		return serviceObj.cancelActivity(requestPayload);
+	}
+	
 	
 
 }
