@@ -33,4 +33,12 @@ public interface GlobalVolunteerServiceDao {
 
 	ResponseEntity<?> cancelActivity(String requestPayload);
 
+	List<ActivityDetails> volunteerRegisteredActivities(int volunteerId);
+
+	ResponseEntity<?> activitycheckIn(String requestPayload);
+
+	ResponseEntity<?> activitycheckOut(String requestPayload);
+
+	ResponseEntity<?> getReportForSystemAdministrator();
+
 }

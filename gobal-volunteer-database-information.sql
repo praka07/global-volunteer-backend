@@ -65,7 +65,7 @@ volunteerApplieddate varchar (50),
 cancel bit default(0),
 canceledDate varchar(50),
 checkInDate varchar(50),
-checkOuttime varchar(50),
+checkOutDate varchar(50),
 foreign key(activityId) REFERENCES globalvolunteer.activityDetails(activityId),
 foreign key (volunteerId) REFERENCES globalvolunteer.users(userId)
 )

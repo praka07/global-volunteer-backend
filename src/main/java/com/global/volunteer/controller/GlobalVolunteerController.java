@@ -91,6 +91,29 @@ public class GlobalVolunteerController {
 		return serviceObj.cancelActivity(requestPayload);
 	}
 	
+	@GetMapping("/volunteerregisteractivities/{volunteerId}")
+	public List<ActivityDetails> volunteerRegisteredActivities(@PathVariable int volunteerId) {
+		return serviceObj.volunteerRegisteredActivities(volunteerId);
+
+	}
+	
+	
+	@PostMapping("/activitycheckin")	
+	public ResponseEntity<?> activitycheckIn(@RequestBody String requestPayload) {
+		return serviceObj.activitycheckIn(requestPayload);
+	}
+	
+	@PostMapping("/activitycheckout")
+	public ResponseEntity<?> activitycheckOut(@RequestBody String requestPayload) {
+		return serviceObj.activitycheckOut(requestPayload);
+	}
+	
+	@GetMapping("/report")
+	public ResponseEntity<?> getReportForSystemAdministrator(){
+		
+		return serviceObj.getReportForSystemAdministrator();
+		
+	}
 	
 
 }

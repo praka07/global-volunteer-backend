@@ -5,8 +5,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
@@ -15,6 +17,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
 import com.global.volunteer.model.ActivityDetails;
+import com.global.volunteer.model.ActivityTransactionDetails;
 import com.global.volunteer.model.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -195,9 +198,8 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 
 		String selectQuery = "SELECT * FROM ACTIVITYDETAILS a where "
 				+ "PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE  "
-				+ "AND STATUS=1 AND NOT"
-				+ " EXISTS(Select '' from activityTransaction where volunteerid="+volunteerId+" and activityid =a.activityid"
-				+ ") ORDER BY ACTIVITYDATE DESC";
+				+ "AND STATUS=1 AND NOT" + " EXISTS(Select '' from activityTransaction where volunteerid=" + volunteerId
+				+ " and activityid =a.activityid" + ") ORDER BY ACTIVITYDATE DESC";
 		log.info("selectQuery -- > {}", selectQuery);
 		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
 		try {
@@ -215,7 +217,8 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	public ResponseEntity<?> updateActivity(ActivityDetails activityDetails) {
 		String updateQuery = "update ACTIVITYDETAILS set status =?,ApprovedBy=?,approvedDate=? where activityid=?";
 		try {
-			jdbcTemplate.update(updateQuery, activityDetails.isStatus(),activityDetails.getApprovedBy(),activityDetails.getActivityDate(), activityDetails.getActivityId());
+			jdbcTemplate.update(updateQuery, activityDetails.isStatus(), activityDetails.getApprovedBy(),
+					activityDetails.getActivityDate(), activityDetails.getActivityId());
 			return ResponseEntity.ok().body("{ \"message\" : \"status updated successfully\"}");
 		} catch (Exception e) {
 			log.info("update password issue {} ", e);
@@ -237,12 +240,14 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 		try {
 			int status = namedParameterJdbcTemplate.update(activityTransactionInsertion, parameters);
 			if (status == 1) {
-				String updateQuery="update activityDetails set appliedVolunteerCount= appliedVolunteerCount+1 where activityId="+request.getInt("activityId");
+				String updateQuery = "update activityDetails set appliedVolunteerCount= appliedVolunteerCount+1 where activityId="
+						+ request.getInt("activityId");
 				jdbcTemplate.update(updateQuery);
 				return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"registered successfully\"}");
 
 			} else {
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error while insert activity transaction");
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("error while insert activity transaction");
 			}
 
 		} catch (Exception e) {
@@ -252,31 +257,157 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 
 		}
 	}
+
 	@Override
 	public ResponseEntity<?> cancelActivity(String requestPayload) {
 		JSONObject request = new JSONObject(requestPayload);
-		String updateActivityTransaction="update activityTransaction set cancel=1, canceledDate='"+request.getString("volunteerCancelDate")+"'"
-				+ " where volunteerId="+request.getInt("volunteerid")+" and  activityId="+request.getInt("activityId");
+		String updateActivityTransaction = "update activityTransaction set cancel=1, canceledDate='"
+				+ request.getString("volunteerCancelDate") + "'" + " where volunteerId=" + request.getInt("volunteerid")
+				+ " and  activityId=" + request.getInt("activityId");
 		try {
-			int status=jdbcTemplate.update(updateActivityTransaction);
-			if(status ==1) {
-				String updateQuery="update activityDetails set appliedVolunteerCount= appliedVolunteerCount-1 where activityId="+request.getInt("activityId");
+			int status = jdbcTemplate.update(updateActivityTransaction);
+			if (status == 1) {
+				String updateQuery = "update activityDetails set appliedVolunteerCount= appliedVolunteerCount-1 where activityId="
+						+ request.getInt("activityId");
 				jdbcTemplate.update(updateQuery);
 
 				return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"cancelled successfully\"}");
-				
-			}else {
-				
-				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("error while cancel activity transaction");
-				
+
+			} else {
+
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+						.body("error while cancel activity transaction");
+
 			}
-		}catch(Exception e) {
-			
+		} catch (Exception e) {
+
 			log.info("error wile cancelActivity", e);
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
-			
+
 		}
-		
+
+	}
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public List<ActivityDetails> volunteerRegisteredActivities(int volunteerId) {
+		String selectQuery = "SELECT * FROM GLOBALVOLUNTEER.ACTIVITYDETAILS  as a inner join "
+				+ "GLOBALVOLUNTEER.ACTIVITYTRANSACTION  as "
+				+ "b on a.activityid = b.activityid where isnull(b.cancel,0)=0 and  b.volunteerid=" + volunteerId;
+		log.info("selectQuery -- > {}", selectQuery);
+		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
+		try {
+			list = jdbcTemplate.query(selectQuery, new BeanPropertyRowMapper(ActivityDetails.class));
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return list;
+
+		}
+
+	}
+
+	@Override
+	public ResponseEntity<?> activitycheckIn(String requestPayload) {
+
+		JSONObject request = new JSONObject(requestPayload);
+		String checkEitherCheckedInOrNotQuery = "select * from activityTransaction where checkindate is null and volunteerId="
+				+ request.getInt("volunteerid") + " and  activityId=" + request.getInt("activityId");
+
+		if (checkInCheckOutValidate(checkEitherCheckedInOrNotQuery)) {
+			String updateActivityTransaction = "update activityTransaction set  checkindate='"
+					+ request.getString("checkInDate") + "'" + " where volunteerId=" + request.getInt("volunteerid")
+					+ " and  activityId=" + request.getInt("activityId");
+			try {
+				jdbcTemplate.update(updateActivityTransaction);
+				return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\" activitychecked In successfully\"}");
+
+			} catch (Exception e) {
+
+				log.info("error wile check in", e);
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+
+			}
+
+		} else {
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"checkedin already\"}");
+
+		}
+
+	}
+
+	@Override
+	public ResponseEntity<?> activitycheckOut(String requestPayload) {
+
+		JSONObject request = new JSONObject(requestPayload);
+		String updateActivityTransaction = "update activityTransaction set  checkoutdate='"
+				+ request.getString("checkoutdate") + "'" + " where volunteerId=" + request.getInt("volunteerid")
+				+ " and  activityId=" + request.getInt("activityId");
+		String checkEitherCheckedOutOrNotQuery = "select * from activityTransaction where checkoutdate is null and volunteerId="
+				+ request.getInt("volunteerid") + " and  activityId=" + request.getInt("activityId");
+
+		if (checkInCheckOutValidate(checkEitherCheckedOutOrNotQuery)) {
+			try {
+				int status = jdbcTemplate.update(updateActivityTransaction);
+				return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"activitychecked In successfully\"}");
+
+			} catch (Exception e) {
+
+				log.info("error wile check in", e);
+				return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+
+			}
+
+		} else {
+
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"checkedout already\"}");
+		}
+
+	}
+
+	@SuppressWarnings("rawtypes")
+	public boolean checkInCheckOutValidate(String query) {
+		log.info("Query -- {} ", query);
+		try {
+			@SuppressWarnings("unchecked")
+			List<ActivityTransactionDetails> status = jdbcTemplate.query(query,
+					new BeanPropertyRowMapper(ActivityTransactionDetails.class));
+			if (status.isEmpty()) {
+				return false;
+
+			} else {
+				return true;
+			}
+
+		} catch (Exception e) {
+			log.info("error wile checkInCheckOutValidate", e);
+			return false;
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> getReportForSystemAdministrator() {
+		String query = "select activityName, (select count(*) from GLOBALVOLUNTEER.ACTIVITYTRANSACTION as b where b.ACTIVITYID=a.ACTIVITYID and isnull(b.CANCEL,0) = 0) as volunteerCount "
+				+ "from GLOBALVOLUNTEER.ACTIVITYDETAILS as a "
+				+ "where datediff(d,PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en'),now()) <=30 and datediff(d,PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en'),now()) >=0";
+		JSONArray responseArray = new JSONArray();
+		try {
+			List<Map<String, Object>> result = jdbcTemplate.queryForList(query);
+			for (@SuppressWarnings("rawtypes")
+			Map m : result) {
+				JSONObject responseObject = new JSONObject();
+				responseObject.put("activityName", m.get("competitionName").toString());
+				responseObject.put("volunteerCount", m.get("competitionDate").toString());
+				responseArray.put(responseObject);
+			}
+
+			return ResponseEntity.status(HttpStatus.OK).body(responseArray.toString());
+
+		} catch (DataAccessException e) {
+			log.info("getReportForSystemAdministrator error {}", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+
 	}
 
 }
