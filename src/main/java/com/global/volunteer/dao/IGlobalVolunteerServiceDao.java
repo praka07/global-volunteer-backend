@@ -396,8 +396,8 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 			for (@SuppressWarnings("rawtypes")
 			Map m : result) {
 				JSONObject responseObject = new JSONObject();
-				responseObject.put("activityName", m.get("competitionName").toString());
-				responseObject.put("volunteerCount", m.get("competitionDate").toString());
+				responseObject.put("activityName", m.get("activityName").toString());
+				responseObject.put("volunteerCount", m.get("volunteerCount").toString());
 				responseArray.put(responseObject);
 			}
 
