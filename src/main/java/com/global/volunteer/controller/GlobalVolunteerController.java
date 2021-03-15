@@ -114,6 +114,12 @@ public class GlobalVolunteerController {
 		return serviceObj.getReportForSystemAdministrator();
 		
 	}
+	@GetMapping("/homepageactivitylist")
+	public List<ActivityDetails> getHomePageActivityList(){
+		return serviceObj.getHomePageActivityList();
+		
+	}
+	
 	
 
 }

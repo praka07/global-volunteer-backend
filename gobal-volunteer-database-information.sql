@@ -77,3 +77,10 @@ drop table GLOBALVOLUNTEER.activityTransaction
 drop table GLOBALVOLUNTEER.ACTIVITYDETAILS 
 create table again
 alter table activityDetails add appliedVolunteerCount int default(0)
+
+
+=================
+phase 4
+======================
+alter table activityDetails add conductedBy varchar(50)
+

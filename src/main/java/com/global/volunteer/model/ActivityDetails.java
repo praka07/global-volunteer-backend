@@ -30,6 +30,7 @@ public class ActivityDetails {
 	private boolean status;
 	private String approvedDate;
 	private int appliedVolunteerCount;
+	private String conductedBy;
 	
 
 }

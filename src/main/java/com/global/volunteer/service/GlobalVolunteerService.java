@@ -40,6 +40,8 @@ public interface GlobalVolunteerService {
 	ResponseEntity<?> activitycheckOut(String requestPayload);
 
 	ResponseEntity<?> getReportForSystemAdministrator();
+
+	List<ActivityDetails> getHomePageActivityList();
 	
 
 }

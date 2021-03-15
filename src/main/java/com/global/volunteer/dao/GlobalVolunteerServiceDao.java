@@ -41,4 +41,6 @@ public interface GlobalVolunteerServiceDao {
 
 	ResponseEntity<?> getReportForSystemAdministrator();
 
+	 List<ActivityDetails> getHomePageActivityList();
+
 }

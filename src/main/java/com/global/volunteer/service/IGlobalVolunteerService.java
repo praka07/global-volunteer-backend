@@ -82,6 +82,11 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 	public ResponseEntity<?> getReportForSystemAdministrator() {
 		return daoObject.getReportForSystemAdministrator();
 	}
+	@Override
+	public List<ActivityDetails> getHomePageActivityList() {
+		return daoObject.getHomePageActivityList();
+		
+	}
 
 
 }

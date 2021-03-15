@@ -146,8 +146,8 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	public ResponseEntity<?> createActivity(ActivityDetails activityDetails) {
 
 		String queryToExecute = "insert into activityDetails(activityName,activityDate,startTime,endTime,"
-				+ "place,duration,content,totalNumberOfPeople,createdBy,createdDate,ApprovedBy,approvedDate) values (:activityname,:activityDate,:startTime,:endTime,:place,:duration"
-				+ ",:content,:totalNumberOfPeople,:createdBy,:createdDate,:ApprovedBy,:approvedDate)";
+				+ "place,duration,content,totalNumberOfPeople,createdBy,createdDate,ApprovedBy,approvedDate,conductedBy) values (:activityname,:activityDate,:startTime,:endTime,:place,:duration"
+				+ ",:content,:totalNumberOfPeople,:createdBy,:createdDate,:ApprovedBy,:approvedDate,:conductedBy)";
 		Map<String, Object> parameters = new HashMap<String, Object>();
 		parameters.put("activityname", activityDetails.getActivityName());
 		parameters.put("activityDate", activityDetails.getActivityDate());
@@ -161,6 +161,7 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 		parameters.put("createdDate", activityDetails.getCreatedDate());
 		parameters.put("ApprovedBy", activityDetails.getApprovedBy());
 		parameters.put("approvedDate", activityDetails.getApprovedDate());
+		parameters.put("conductedBy", activityDetails.getConductedBy());
 		try {
 			namedParameterJdbcTemplate.update(queryToExecute, parameters);
 			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"user registered successfully\"}");
@@ -408,6 +409,23 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
 		}
 
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<ActivityDetails> getHomePageActivityList() {
+		String selectQuery = "SELECT TOP 4* FROM ACTIVITYDETAILS where "
+				+ "PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE and status =1 "
+				+ "ORDER BY ACTIVITYDATE DESC";
+		log.info("selectQuery in getHomePageActivityList method-- > {}", selectQuery);
+		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
+		try {
+			list = jdbcTemplate.query(selectQuery, new BeanPropertyRowMapper(ActivityDetails.class));
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return list;
+
+		}
 	}
 
 }
