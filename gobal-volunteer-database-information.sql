@@ -84,3 +84,10 @@ phase 4
 ======================
 alter table activityDetails add conductedBy varchar(50)
 
+
+===============
+phase 5
+===================
+
+alter table GLOBALVOLUNTEER.ACTIVITYDETAILS alter column status char default ('P');
+

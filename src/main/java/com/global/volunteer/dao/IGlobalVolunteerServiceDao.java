@@ -199,15 +199,15 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 
 		String selectQuery = "SELECT * FROM ACTIVITYDETAILS a where "
 				+ "PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE  "
-				+ "AND STATUS=1 AND NOT" + " EXISTS(Select '' from activityTransaction where volunteerid=" + volunteerId
-				+ " and activityid =a.activityid" + ") ORDER BY ACTIVITYDATE DESC";
+				+ "AND STATUS='A' AND NOT" + " EXISTS(Select '' from activityTransaction where volunteerid="
+				+ volunteerId + " and activityid =a.activityid" + ") ORDER BY ACTIVITYDATE DESC";
 		log.info("selectQuery -- > {}", selectQuery);
 		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
 		try {
 			list = jdbcTemplate.query(selectQuery, new BeanPropertyRowMapper(ActivityDetails.class));
 			return list;
 		} catch (Exception e) {
-			e.printStackTrace();
+			log.info("getUpcomingActivitiesForVolunteers issue {} ", e);
 			return list;
 
 		}
@@ -218,7 +218,7 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	public ResponseEntity<?> updateActivity(ActivityDetails activityDetails) {
 		String updateQuery = "update ACTIVITYDETAILS set status =?,ApprovedBy=?,approvedDate=? where activityid=?";
 		try {
-			jdbcTemplate.update(updateQuery, activityDetails.isStatus(), activityDetails.getApprovedBy(),
+			jdbcTemplate.update(updateQuery, activityDetails.getStatus(), activityDetails.getApprovedBy(),
 					activityDetails.getActivityDate(), activityDetails.getActivityId());
 			return ResponseEntity.ok().body("{ \"message\" : \"status updated successfully\"}");
 		} catch (Exception e) {
@@ -410,11 +410,12 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 		}
 
 	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List<ActivityDetails> getHomePageActivityList() {
 		String selectQuery = "SELECT TOP 4* FROM ACTIVITYDETAILS where "
-				+ "PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE and status =1 "
+				+ "PARSEDATETIME(replace (activitydate,'/',' '),'dd MMM yyyy','en') >= CURRENT_DATE and status = 'A' "
 				+ "ORDER BY ACTIVITYDATE DESC";
 		log.info("selectQuery in getHomePageActivityList method-- > {}", selectQuery);
 		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
