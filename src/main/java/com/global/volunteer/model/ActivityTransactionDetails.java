@@ -23,5 +23,6 @@ public class ActivityTransactionDetails {
 	private String canceledDate;
 	private String checkInDate;
 	private String checkOutDate;
+	private boolean attendend;
 
 }

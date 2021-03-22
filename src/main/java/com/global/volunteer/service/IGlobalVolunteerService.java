@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.global.volunteer.dao.IGlobalVolunteerServiceDao;
 import com.global.volunteer.model.ActivityDetails;
+import com.global.volunteer.model.FeedBack;
 import com.global.volunteer.model.User;
 
 @Service
@@ -86,6 +87,18 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 	public List<ActivityDetails> getHomePageActivityList() {
 		return daoObject.getHomePageActivityList();
 		
+	}
+	@Override
+	public List<FeedBack> getFeedBackByUserId(int loggedInUserId) {
+		return daoObject.getFeedBackByUserId(loggedInUserId);
+	}
+	@Override
+	public List<FeedBack> editFeedBackByUserId(int loggedInUserId) {
+		return daoObject.editFeedBackByUserId(loggedInUserId);
+	}
+	@Override
+	public List<ActivityDetails> attendedActivityListById(int loggedInUserId) {
+		return daoObject.attendedActivityListById(loggedInUserId);
 	}
 
 

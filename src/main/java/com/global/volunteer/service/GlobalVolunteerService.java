@@ -6,6 +6,7 @@ import org.json.JSONObject;
 import org.springframework.http.ResponseEntity;
 
 import com.global.volunteer.model.ActivityDetails;
+import com.global.volunteer.model.FeedBack;
 import com.global.volunteer.model.User;
 
 public interface GlobalVolunteerService {
@@ -42,6 +43,12 @@ public interface GlobalVolunteerService {
 	ResponseEntity<?> getReportForSystemAdministrator();
 
 	List<ActivityDetails> getHomePageActivityList();
+
+	List<FeedBack> getFeedBackByUserId(int loggedInUserId);
+
+	List<FeedBack> editFeedBackByUserId(int loggedInUserId);
+
+	List<ActivityDetails> attendedActivityListById(int loggedInUserId);
 	
 
 }

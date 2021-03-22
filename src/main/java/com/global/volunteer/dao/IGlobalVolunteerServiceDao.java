@@ -18,6 +18,7 @@ import org.springframework.stereotype.Repository;
 
 import com.global.volunteer.model.ActivityDetails;
 import com.global.volunteer.model.ActivityTransactionDetails;
+import com.global.volunteer.model.FeedBack;
 import com.global.volunteer.model.User;
 
 import lombok.extern.slf4j.Slf4j;
@@ -316,7 +317,7 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 				+ request.getInt("volunteerid") + " and  activityId=" + request.getInt("activityId");
 
 		if (checkInCheckOutValidate(checkEitherCheckedInOrNotQuery)) {
-			String updateActivityTransaction = "update activityTransaction set  checkindate='"
+			String updateActivityTransaction = "update activityTransaction set  attendend=TRUE checkindate='"
 					+ request.getString("checkInDate") + "'" + " where volunteerId=" + request.getInt("volunteerid")
 					+ " and  activityId=" + request.getInt("activityId");
 			try {
@@ -427,6 +428,43 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 			return list;
 
 		}
+	}
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public List<FeedBack> getFeedBackByUserId(int loggedInUserId) {
+		String getFeedBackQuery="select * from feedback where createdBy="+loggedInUserId;
+		log.info("getFeedBackQuery ::: {}",getFeedBackQuery);
+		List<FeedBack> feedBackResult= new ArrayList<FeedBack>();
+		try {
+			feedBackResult = jdbcTemplate.query(getFeedBackQuery, new BeanPropertyRowMapper(FeedBack.class));
+			return feedBackResult;
+			
+		}catch(Exception e) {
+			log.info("error during getFeedBackByUserId {}", e);
+			return feedBackResult;
+		}
+	}
+	@Override
+	public List<FeedBack> editFeedBackByUserId(int loggedInUserId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public List<ActivityDetails> attendedActivityListById(int loggedInUserId) {
+		String selectQuery = "select  b.* from activityTransaction as a inner join activityDetails as b on\r\n"
+				+ "a.activityId=b.activityId where attendend =TRUE and volunteerId="+loggedInUserId;
+		log.info("selectQuery -- > {}", selectQuery);
+		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
+		try {
+			list = jdbcTemplate.query(selectQuery, new BeanPropertyRowMapper(ActivityDetails.class));
+			return list;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return list;
+
+		}
+		
 	}
 
 }
