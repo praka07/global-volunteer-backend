@@ -100,6 +100,15 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 	public List<ActivityDetails> attendedActivityListById(int loggedInUserId) {
 		return daoObject.attendedActivityListById(loggedInUserId);
 	}
+	@Override
+	public ResponseEntity<?> createFeedback(String requetPayload) {
+		return daoObject.createFeedback(requetPayload);
+	}
+
+	@Override
+	public ResponseEntity<?> deletedFeedbackByid(int id) {
+		return daoObject.deletedFeedbackByid(id);
+	}
 
 
 }

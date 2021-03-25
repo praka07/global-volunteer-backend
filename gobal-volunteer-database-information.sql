@@ -91,22 +91,27 @@ phase 5
 
 alter table GLOBALVOLUNTEER.ACTIVITYDETAILS alter column status char default ('P');
 
-==============
-phase 6
+================
+phase 6 -- feedback
 ====================
 use globalvolunteer
 alter table activityTransaction add attendend bit default(0)
 
 create table feedback (
 id int AUTO_INCREMENT primary key,
-transactionId int,
+activityId int,
 comments varchar(500),
-attachmentName varchar(500),
 createdBy int,
 createdDate varchar(50),
-foreign key (transactionId) REFERENCES globalvolunteer.activityTransaction(id)
+foreign key (activityId) REFERENCES globalvolunteer.activityDetails(activityId)
 )
-
+create table feedbackAttachment(
+id int AUTO_INCREMENT primary key,
+feedbackId int,
+attachmentName varchar(500),
+attachmentContent text,
+foreign key (feedbackId) REFERENCES globalvolunteer.feedback(id)
+)
 
 
 

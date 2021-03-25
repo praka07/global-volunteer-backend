@@ -49,6 +49,10 @@ public interface GlobalVolunteerService {
 	List<FeedBack> editFeedBackByUserId(int loggedInUserId);
 
 	List<ActivityDetails> attendedActivityListById(int loggedInUserId);
+
+	ResponseEntity<?> createFeedback(String requetPayload);
+
+	ResponseEntity<?> deletedFeedbackByid(int id);
 	
 
 }

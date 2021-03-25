@@ -50,4 +50,8 @@ public interface GlobalVolunteerServiceDao {
 
 	List<ActivityDetails> attendedActivityListById(int loggedInUserId);
 
+	ResponseEntity<?> createFeedback(String requetPayload);
+
+	ResponseEntity<?> deletedFeedbackByid(int id);
+
 }

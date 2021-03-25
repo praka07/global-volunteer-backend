@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
@@ -13,6 +14,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.stereotype.Repository;
 
@@ -429,31 +431,34 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 
 		}
 	}
+
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List<FeedBack> getFeedBackByUserId(int loggedInUserId) {
-		String getFeedBackQuery="select * from feedback where createdBy="+loggedInUserId;
-		log.info("getFeedBackQuery ::: {}",getFeedBackQuery);
-		List<FeedBack> feedBackResult= new ArrayList<FeedBack>();
+		String getFeedBackQuery = "select * from feedback where createdBy=" + loggedInUserId;
+		log.info("getFeedBackQuery ::: {}", getFeedBackQuery);
+		List<FeedBack> feedBackResult = new ArrayList<FeedBack>();
 		try {
 			feedBackResult = jdbcTemplate.query(getFeedBackQuery, new BeanPropertyRowMapper(FeedBack.class));
 			return feedBackResult;
-			
-		}catch(Exception e) {
+
+		} catch (Exception e) {
 			log.info("error during getFeedBackByUserId {}", e);
 			return feedBackResult;
 		}
 	}
+
 	@Override
 	public List<FeedBack> editFeedBackByUserId(int loggedInUserId) {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List<ActivityDetails> attendedActivityListById(int loggedInUserId) {
-		String selectQuery = "select  b.* from activityTransaction as a inner join activityDetails as b on\r\n"
-				+ "a.activityId=b.activityId where attendend =TRUE and volunteerId="+loggedInUserId;
+		String selectQuery = "select  b.* from activityTransaction as a inner join activityDetails as b on "
+				+ "a.activityId=b.activityId where attendend =TRUE and volunteerId=" + loggedInUserId;
 		log.info("selectQuery -- > {}", selectQuery);
 		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
 		try {
@@ -464,7 +469,62 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 			return list;
 
 		}
-		
+
+	}
+
+	@Override
+	public ResponseEntity<?> createFeedback(String requetPayload) {
+		try {
+			JSONObject requestObject = new JSONObject(requetPayload);
+			String insertFeedBackQuery = "insert into feedback (activityId,comments,createdBy,createdDate) values"
+					+ "(:activityId,:comments,:createdBy,:createdDate) ";
+			Map<String, Object> parameters = new HashMap<String, Object>();
+			parameters.put("activityId", requestObject.get("activityId"));
+			parameters.put("comments", requestObject.get("comments"));
+			parameters.put("createdBy", requestObject.get("createdBy"));
+			parameters.put("createdDate", requestObject.get("createdDate"));
+			namedParameterJdbcTemplate.update(insertFeedBackQuery, parameters);
+			log.info("Feed back inserted");
+			String getFeedbackId = "select * from feedback where activityId=" + requestObject.get("activityId");
+			List<Map<String, Object>> result = jdbcTemplate.queryForList(getFeedbackId);
+			int feedbackId = 0;
+			for (@SuppressWarnings("rawtypes")
+			Map m : result) {
+				feedbackId = (int) m.get("id");
+			}
+			JSONArray attachmentArray = requestObject.getJSONArray("attachmentContent");
+
+			for (int i = 0; i < attachmentArray.length(); i++) {
+				JSONObject attachmentObject = attachmentArray.getJSONObject(i);
+				String query = "insert into feedbackAttachment (feedbackId,attachmentName,attachmentContent) values ("
+						+ feedbackId + ",'" + attachmentObject.get("name") + "','" + attachmentObject.get("content")
+						+ "')";
+				log.info(" insert feed back image query >-- > {}", query);
+
+				jdbcTemplate.update(query);
+
+			}
+
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"feedback created  successfully \"}");
+		} catch (DataAccessException e) {
+			log.info("createFeedback error {}", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		} catch (JSONException e) {
+			log.info("createFeedback error {}", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
+	}
+
+	@Override
+	public ResponseEntity<?> deletedFeedbackByid(int id) {
+		try {
+			String deleteQuery = "";
+			jdbcTemplate.update(deleteQuery);
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"feedback deleted  successfully \"}");
+		} catch (Exception e) {
+			log.info("deletedFeedbackByid error {}", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
 	}
 
 }
