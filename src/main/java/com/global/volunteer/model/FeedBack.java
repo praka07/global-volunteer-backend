@@ -3,6 +3,8 @@
  */
 package com.global.volunteer.model;
 
+import java.util.List;
+
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -21,6 +23,7 @@ public class FeedBack {
 	private String attachmentName;
 	private int createdBy;
 	private String createdDate;
+	private String attachmentContent;
 	
 
 }

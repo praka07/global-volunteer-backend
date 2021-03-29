@@ -129,11 +129,7 @@ public class GlobalVolunteerController {
 		return serviceObj.getFeedBackByUserId(loggedInUserId);
 
 	}
-	@GetMapping("/editfeedbackbyid/{userid}")
-	public List<FeedBack> editFeedBackByUserId(@PathVariable("userid") int loggedInUserId) {
-		return serviceObj.editFeedBackByUserId(loggedInUserId);
-
-	}
+	
 	
 	@GetMapping("/checkedinactivitylist/{userid}")	
 	public List<ActivityDetails> attendedActivityListById(@PathVariable("userid") int loggedInUserId) {
@@ -147,8 +143,13 @@ public class GlobalVolunteerController {
 	}
 
 	@DeleteMapping("/feedback/{id}")
-	public ResponseEntity<?> deletedFeedbackByid(@PathVariable int id){
-		return serviceObj.deletedFeedbackByid(id);
+	public ResponseEntity<?> deletedFeedbackByid(@PathVariable("id") int feedbackId){
+		return serviceObj.deletedFeedbackByid(feedbackId);
 		
+	}
+	@PutMapping("/editfeedbackbyid")
+	public ResponseEntity<?> editFeedBackByUserId(@RequestBody FeedBack updateObhject) {
+		return serviceObj.editFeedBackByUserId(updateObhject);
+
 	}
 } 

@@ -93,8 +93,8 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 		return daoObject.getFeedBackByUserId(loggedInUserId);
 	}
 	@Override
-	public List<FeedBack> editFeedBackByUserId(int loggedInUserId) {
-		return daoObject.editFeedBackByUserId(loggedInUserId);
+	public ResponseEntity<?> editFeedBackByUserId(FeedBack updateObhject) {
+		return daoObject.editFeedBackByUserId(updateObhject);
 	}
 	@Override
 	public List<ActivityDetails> attendedActivityListById(int loggedInUserId) {
@@ -106,8 +106,8 @@ public class IGlobalVolunteerService implements GlobalVolunteerService {
 	}
 
 	@Override
-	public ResponseEntity<?> deletedFeedbackByid(int id) {
-		return daoObject.deletedFeedbackByid(id);
+	public ResponseEntity<?> deletedFeedbackByid(int feedbackId) {
+		return daoObject.deletedFeedbackByid(feedbackId);
 	}
 
 

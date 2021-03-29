@@ -46,12 +46,13 @@ public interface GlobalVolunteerServiceDao {
 
 	List<FeedBack> getFeedBackByUserId(int loggedInUserId);
 
-	List<FeedBack> editFeedBackByUserId(int loggedInUserId);
 
 	List<ActivityDetails> attendedActivityListById(int loggedInUserId);
 
 	ResponseEntity<?> createFeedback(String requetPayload);
 
 	ResponseEntity<?> deletedFeedbackByid(int id);
+
+	ResponseEntity<?> editFeedBackByUserId(FeedBack updateObhject);
 
 }

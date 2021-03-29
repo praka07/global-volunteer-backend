@@ -435,12 +435,36 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
 	public List<FeedBack> getFeedBackByUserId(int loggedInUserId) {
-		String getFeedBackQuery = "select * from feedback where createdBy=" + loggedInUserId;
+		String getFeedBackQuery = "select a.id,comments,createdDate,attachmentName,attachmentContent from feedback as a inner join "
+				+ "feedbackAttachment as b on a.id =b.feedbackId where a.createdBy=" + loggedInUserId;
 		log.info("getFeedBackQuery ::: {}", getFeedBackQuery);
 		List<FeedBack> feedBackResult = new ArrayList<FeedBack>();
 		try {
 			feedBackResult = jdbcTemplate.query(getFeedBackQuery, new BeanPropertyRowMapper(FeedBack.class));
-			return feedBackResult;
+
+			List<FeedBack> retuenFeedBackResult = new ArrayList<FeedBack>();
+
+			if (feedBackResult.size() > 1) {
+				FeedBack obj = new FeedBack();
+				obj.setId(feedBackResult.get(0).getId());
+				obj.setComments(feedBackResult.get(0).getComments());
+				obj.setCreatedDate(feedBackResult.get(0).getCreatedDate());
+				List<String> attachmentName = new ArrayList<String>();
+				List<String> attachmentContents = new ArrayList<String>();
+
+				for (FeedBack feedback : feedBackResult) {
+					attachmentName.add(feedback.getAttachmentName());
+					attachmentContents.add(feedback.getAttachmentContent());
+				}
+
+				obj.setAttachmentName(attachmentName.toString().replace("[", "").replace("]", ""));
+				obj.setAttachmentContent(attachmentContents.toString().replace("[", "").replace("]", ""));
+				retuenFeedBackResult.add(obj);
+				return retuenFeedBackResult;
+
+			} else {
+				return feedBackResult;
+			}
 
 		} catch (Exception e) {
 			log.info("error during getFeedBackByUserId {}", e);
@@ -449,16 +473,25 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	}
 
 	@Override
-	public List<FeedBack> editFeedBackByUserId(int loggedInUserId) {
-		// TODO Auto-generated method stub
-		return null;
+	public ResponseEntity<?> editFeedBackByUserId(FeedBack updateObhject) {
+		try {
+			String updateQuery = "update feedback set comments =? where id=?";
+			jdbcTemplate.update(updateQuery, updateObhject.getComments(), updateObhject.getId());
+
+			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"updated successfully\"}");
+
+		} catch (JSONException e) {
+			log.info("createFeedback error {}", e);
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+		}
 	}
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
 	public List<ActivityDetails> attendedActivityListById(int loggedInUserId) {
 		String selectQuery = "select  b.* from activityTransaction as a inner join activityDetails as b on "
-				+ "a.activityId=b.activityId where attendend =TRUE and volunteerId=" + loggedInUserId;
+				+ "a.activityId=b.activityId where attendend =TRUE and volunteerId=" + loggedInUserId
+				+ " and  not exists ( select '' from feedback where activityid = a.activityId)";
 		log.info("selectQuery -- > {}", selectQuery);
 		List<ActivityDetails> list = new ArrayList<ActivityDetails>();
 		try {
@@ -516,10 +549,13 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 	}
 
 	@Override
-	public ResponseEntity<?> deletedFeedbackByid(int id) {
+	public ResponseEntity<?> deletedFeedbackByid(int feedbackId) {
 		try {
-			String deleteQuery = "";
-			jdbcTemplate.update(deleteQuery);
+			String deleteFeedbackAttachment = "delete from  feedbackAttachment where feedbackId=" + feedbackId;
+			jdbcTemplate.update(deleteFeedbackAttachment);
+			String deleteFeedback = "delete from  feedback where id=" + feedbackId;
+			jdbcTemplate.update(deleteFeedback);
+
 			return ResponseEntity.status(HttpStatus.OK).body("{\"message\":\"feedback deleted  successfully \"}");
 		} catch (Exception e) {
 			log.info("deletedFeedbackByid error {}", e);
