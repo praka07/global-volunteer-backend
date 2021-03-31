@@ -319,7 +319,7 @@ public class IGlobalVolunteerServiceDao implements GlobalVolunteerServiceDao {
 				+ request.getInt("volunteerid") + " and  activityId=" + request.getInt("activityId");
 
 		if (checkInCheckOutValidate(checkEitherCheckedInOrNotQuery)) {
-			String updateActivityTransaction = "update activityTransaction set  attendend=TRUE checkindate='"
+			String updateActivityTransaction = "update activityTransaction set  attendend=TRUE, checkindate='"
 					+ request.getString("checkInDate") + "'" + " where volunteerId=" + request.getInt("volunteerid")
 					+ " and  activityId=" + request.getInt("activityId");
 			try {
